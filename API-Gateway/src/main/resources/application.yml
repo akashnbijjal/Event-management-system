@@ -17,3 +17,21 @@ spring:
         uri: http://localhost:8091
         predicates:
         - Path=/event/**
+        
+        
+      - id: Ticket
+        uri: http://localhost:8092
+        predicates:
+        - Path=/ticket/**
+        
+      - id: Venue
+        uri: http://localhost:8093
+        predicates:
+        - Path=/venue/**
+        
+      - id: Authentication-Service
+        uri: http://localhost:8095
+        predicates:
+        - Path=/api/**
+        
+       

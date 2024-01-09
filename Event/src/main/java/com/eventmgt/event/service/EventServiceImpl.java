@@ -84,7 +84,7 @@ public class EventServiceImpl implements EventService {
 			logger.warn("Not Found event with ID: {}" + eventId);
 			return "Event not found with ID:" + eventId;
 		}
-
+ 
 	}
 
 }
