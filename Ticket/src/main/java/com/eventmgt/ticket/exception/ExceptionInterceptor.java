@@ -28,4 +28,12 @@ public class ExceptionInterceptor extends ResponseEntityExceptionHandler {
 		return new ResponseEntity<ErrorDetails>(errorDetails, HttpStatus.BAD_GATEWAY);
 
 	}
+
+	@ExceptionHandler(EventNotFound.class)
+	public final ResponseEntity<ErrorDetails> handleEventNotFoundException(EventNotFound ex, WebRequest request)
+			throws EventNotFound {
+		ErrorDetails errorDetails = new ErrorDetails(LocalDateTime.now(), ex.getMsg(), request.getDescription(false));
+		return new ResponseEntity<ErrorDetails>(errorDetails, HttpStatus.BAD_GATEWAY);
+
+	}
 }

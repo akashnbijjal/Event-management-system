@@ -36,4 +36,10 @@ public class VenueServiceImpl implements VenueService {
 		return venue;
 	}
 
+	@Override
+	public Venue updatevenue(Venue updatevenue) {
+		Venue venue = repo.save(updatevenue);
+		return venue;
+	}
+
 }

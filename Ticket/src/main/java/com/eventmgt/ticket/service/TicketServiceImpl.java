@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.eventmgt.ticket.exception.EventNotFound;
 import com.eventmgt.ticket.exception.ticketNotFoundException;
+import com.eventmgt.ticket.feign.EventClient;
 import com.eventmgt.ticket.model.Event;
 import com.eventmgt.ticket.model.Ticket;
 import com.eventmgt.ticket.repository.TicketRepository;
@@ -23,31 +25,39 @@ public class TicketServiceImpl implements TicketService {
 	@Autowired
 	private RestTemplate restTemplate;
 
+	@Autowired
+	private EventClient eventclient;
+
 	private static final Logger logger = LoggerFactory.getLogger(TicketServiceImpl.class);
 
 	@Override
 	public Ticket bookticket(Ticket addticket) {
-		Event event = restTemplate.getForObject("http://localhost:8091/event/get/" + addticket.getEventId(),
-				Event.class);
-		String ticketType = addticket.getTickettype();
-		int quantity = addticket.getQuantity();
-		Map<String, Double> ticketTypesPrices = event.getTicketTypesPrices();
 
-		if (ticketTypesPrices.containsKey(ticketType)) {
-			Double ticketprice = ticketTypesPrices.get(ticketType) * quantity;
-			addticket.setPrice(ticketprice);
+
+		Event event = eventclient.getEvent(addticket.getEventId());
+		if (addticket.getEventId() == event.getEventId()) {
+			String ticketType = addticket.getTickettype();
+			int quantity = addticket.getQuantity();
+			Map<String, Double> ticketTypesPrices = event.getTicketTypesPrices();
+
+			if (ticketTypesPrices.containsKey(ticketType)) {
+				Double ticketprice = ticketTypesPrices.get(ticketType) * quantity;
+				addticket.setPrice(ticketprice);
+			}
+			Ticket ticket = repo.save(addticket);
+			ticket.setEventdetails(event);
+			return ticket;
+		} else {
+			throw new EventNotFound("Event not found with ID: " + addticket.getEventId());
 		}
-		Ticket ticket = repo.save(addticket);
-		ticket.setEventdetails(event);
-		return ticket;
 	}
 
 	@Override
 	public Ticket getticketbyid(long ticketId) {
 		if (repo.existsById(ticketId)) {
 			Ticket ticket = repo.findById(ticketId).get();
-			Event event = restTemplate.getForObject("http://localhost:8091/event/get/" + ticket.getEventId(),
-					Event.class);
+
+			Event event = eventclient.getEvent(ticket.getEventId());
 			ticket.setEventdetails(event);
 			logger.info("Ticket found with ID: " + ticketId);
 			return ticket;

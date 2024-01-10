@@ -14,4 +14,6 @@ public interface VenueService {
 
 	Venue getvenuebyid(long venueId);
 
+	Venue updatevenue(Venue updatevenue);
+
 }

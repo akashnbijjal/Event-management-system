@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 
 import com.eventmgt.event.exception.EventAlreadyExists;
 import com.eventmgt.event.exception.EventNotFound;
+import com.eventmgt.event.feign.VenueService;
 import com.eventmgt.event.model.Event;
+import com.eventmgt.event.model.Venue;
 import com.eventmgt.event.repository.EventRepository;
 
 @Service
@@ -18,6 +20,9 @@ public class EventServiceImpl implements EventService {
 
 	@Autowired
 	private EventRepository repo;
+
+	@Autowired
+	private VenueService venueservice;
 
 	private static final Logger logger = LoggerFactory.getLogger(EventServiceImpl.class);
 
@@ -37,6 +42,8 @@ public class EventServiceImpl implements EventService {
 	public Event geteventbyid(long eventId) {
 		if (repo.existsById(eventId)) {
 			Event event = repo.findById(eventId).get();
+			List<Venue> list = venueservice.getVenue(event.getVenue());
+			event.setVenuedetails(list);
 			logger.info("Retrieved event with ID: {}", eventId);
 			return event;
 		} else {
@@ -48,6 +55,7 @@ public class EventServiceImpl implements EventService {
 	@Override
 	public List<Event> geteventbyname(String eventname) {
 		List<Event> list = repo.findByEventnameIgnoreCaseContaining(eventname);
+		
 		if (list.isEmpty()) {
 			logger.warn("\"No events found with name containing: {}", eventname);
 		} else {
@@ -84,7 +92,7 @@ public class EventServiceImpl implements EventService {
 			logger.warn("Not Found event with ID: {}" + eventId);
 			return "Event not found with ID:" + eventId;
 		}
- 
+
 	}
 
 }
