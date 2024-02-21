@@ -20,10 +20,10 @@ import com.eventmgt.ticket.repository.TicketRepository;
 public class TicketServiceImpl implements TicketService {
 
 	@Autowired
-	private TicketRepository repo;
+	private SequenceGeneratorService sequenceGeneratorService;
 
 	@Autowired
-	private RestTemplate restTemplate;
+	private TicketRepository repo;
 
 	@Autowired
 	private EventClient eventclient;
@@ -32,7 +32,6 @@ public class TicketServiceImpl implements TicketService {
 
 	@Override
 	public Ticket bookticket(Ticket addticket) {
-
 
 		Event event = eventclient.getEvent(addticket.getEventId());
 		if (addticket.getEventId() == event.getEventId()) {
@@ -44,6 +43,7 @@ public class TicketServiceImpl implements TicketService {
 				Double ticketprice = ticketTypesPrices.get(ticketType) * quantity;
 				addticket.setPrice(ticketprice);
 			}
+			addticket.setTicketId(sequenceGeneratorService.generateSequence(Ticket.SEQUENCE_NAME));
 			Ticket ticket = repo.save(addticket);
 			ticket.setEventdetails(event);
 			return ticket;

@@ -15,6 +15,9 @@ import lombok.NoArgsConstructor;
 @Document(collection = "ticket")
 public class Ticket {
 
+	@Transient
+	public static final String SEQUENCE_NAME = "ticket_sequence";
+	
 	@Id
 	private long ticketId;
 

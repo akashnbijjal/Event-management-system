@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.eventmgt.event.exception.EventAlreadyExists;
 import com.eventmgt.event.exception.EventNotFound;
 import com.eventmgt.event.feign.VenueService;
+import com.eventmgt.event.model.DatabaseSequence;
 import com.eventmgt.event.model.Event;
 import com.eventmgt.event.model.Venue;
 import com.eventmgt.event.repository.EventRepository;
@@ -24,16 +25,22 @@ public class EventServiceImpl implements EventService {
 	@Autowired
 	private VenueService venueservice;
 
+	@Autowired
+	private SequenceGeneratorService sequenceGeneratorService;
+
 	private static final Logger logger = LoggerFactory.getLogger(EventServiceImpl.class);
 
 	@Override
 	public Event createEvent(Event createEvent) {
 		if (!repo.existsByStartDateTimeAndEndDateTime(createEvent.getStartDateTime(), createEvent.getEndDateTime())) {
+			createEvent.setEventId(sequenceGeneratorService.generateSequence(Event.SEQUENCE_NAME));
+			createEvent.setVenuedetails(venueservice.getVenue(createEvent.getVenue()));
 			Event event = repo.save(createEvent);
+
 			logger.info("Event created successfully!!!!!!");
 			return event;
 		} else {
-			logger.warn("Event creation unsuccessfull");
+
 			throw new EventAlreadyExists("Venue is already booked during this time");
 		}
 	}
@@ -55,11 +62,14 @@ public class EventServiceImpl implements EventService {
 	@Override
 	public List<Event> geteventbyname(String eventname) {
 		List<Event> list = repo.findByEventnameIgnoreCaseContaining(eventname);
-		
+
 		if (list.isEmpty()) {
 			logger.warn("\"No events found with name containing: {}", eventname);
 		} else {
 			logger.info("Found {} event(s) with name containing: {}", list.size(), eventname);
+		}
+		for (Event event : list) {
+			event.setVenuedetails(venueservice.getVenue(event.getVenue()));
 		}
 		return list;
 	}
@@ -72,12 +82,15 @@ public class EventServiceImpl implements EventService {
 		} else {
 			logger.info("Found {} event(s) within the dates: {}");
 		}
+
 		return list;
 	}
 
 	@Override
 	public Event updateevent(Event updateEvent) {
+		updateEvent.setVenuedetails(venueservice.getVenue(updateEvent.getVenue()));
 		Event event = repo.save(updateEvent);
+
 		logger.info("Event details updated!!!!!!!!");
 		return event;
 	}

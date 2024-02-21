@@ -17,6 +17,9 @@ import lombok.NoArgsConstructor;
 @Data
 @Document(collection = "Event")
 public class Event {
+	
+	@Transient
+	public static final String SEQUENCE_NAME = "event_sequence";
 
 	@Id
 	private long eventId;
