@@ -7,7 +7,7 @@ public interface TicketService {
 	Ticket bookticket(Ticket addticket);
 
 	Ticket getticketbyid(long ticketId);
-	
-	
+
+	String cancelTicket(long ticketId);
 
 }

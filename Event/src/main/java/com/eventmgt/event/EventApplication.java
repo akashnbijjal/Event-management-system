@@ -22,6 +22,7 @@ public class EventApplication {
 	public RestTemplate restTemplate() {
 		return new RestTemplate();
 	}
+	//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 -github token
 
 	public static void main(String[] args) {
 		SpringApplication.run(EventApplication.class, args);

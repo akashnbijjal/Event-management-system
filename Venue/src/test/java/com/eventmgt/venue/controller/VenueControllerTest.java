@@ -2,9 +2,7 @@ package com.eventmgt.venue.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
-
 import java.util.List;
-
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
 import com.eventmgt.venue.model.Venue;
 import com.eventmgt.venue.service.VenueServiceImpl;
 
@@ -77,6 +74,20 @@ class VenueControllerTest {
 		assertEquals(HttpStatus.ACCEPTED, response.getStatusCode());
 		assertEquals(expectedVenue, response.getBody());
 		verify(service).getvenuebyid(venueId);
+	}
+
+	@Test
+	public void testupdatevenue() {
+		Venue newVenue = new Venue(1, "UB_City_Bengaluru", "Bengaluru", 500, "Wi-Fi, Projectors, Catering, Liquor",
+				1500000, "ub@venue.com", "+91834567890");
+		Venue expectedVenue = new Venue(1, "UB_City_Bengaluru", "Bengaluru", 500, "Wi-Fi, Projectors, Catering, Liquor",
+				1500000, "ub@venue.com", "+91834567890");
+
+		Mockito.when(service.updatevenue(newVenue)).thenReturn(expectedVenue);
+		ResponseEntity<Venue> response = controller.updatevenue(newVenue);
+		assertEquals(HttpStatus.CREATED, response.getStatusCode());
+		assertEquals(expectedVenue, response.getBody());
+		verify(service).updatevenue(newVenue);
 	}
 
 }

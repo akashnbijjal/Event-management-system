@@ -69,4 +69,16 @@ public class TicketServiceImpl implements TicketService {
 
 	}
 
+	@Override
+	public String cancelTicket(long ticketId) {
+		if (repo.existsById(ticketId)) {
+			repo.deleteById(ticketId);
+			logger.info("Ticket cancelled with ID: " + ticketId);
+			return "Ticket deleted successfully ID: " + ticketId;
+		} else {
+			logger.warn("Ticket with ID {} not found", ticketId);
+			throw new ticketNotFoundException("ticket not found with ID: " + ticketId);
+		}
+	}
+
 }
